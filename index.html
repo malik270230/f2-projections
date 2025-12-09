@@ -427,5 +427,20 @@
     }
   }
 </script>
+  <button onclick="sendText()" 
+style="margin-top:20px; width:100%; padding:14px; font-size:18px; background:#f97316; color:white; border:none; border-radius:8px;">
+📱 Text Summary
+</button>
+
+<script>
+function sendText() {
+    recalc();  
+    var summary = encodeURIComponent(buildSummary());
+    var phone = "7326296816"; // <<< CHANGE THIS TO YOUR PHONE NUMBER
+
+    // Opens iMessage/SMS app with summary pre-filled
+    window.location.href = "sms:" + phone + "?&body=" + summary;
+}
+</script>
 </body>
 </html>
