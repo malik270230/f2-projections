@@ -150,15 +150,6 @@
     transform:translateY(1px);
     box-shadow:0 6px 16px rgba(249,115,22,0.5);
   }
-  #summaryBox {
-    display:none;
-    margin-top:10px;
-  }
-  #summaryBox textarea {
-    min-height:120px;
-    font-size:13px;
-    white-space:pre-wrap;
-  }
 </style>
 </head>
 <body>
@@ -312,7 +303,7 @@
     </div>
   </div>
 
-  <!-- Notes + summary -->
+  <!-- Notes -->
   <div class="card">
     <div class="card-header">
       <div class="card-title">Notes</div>
@@ -320,16 +311,13 @@
     <div class="field">
       <textarea id="notes" placeholder="Notes (e.g. 2 call-outs, heavy parcels in zone 3)…"></textarea>
     </div>
-
-    <button type="button" onclick="copySummary()">Copy summary for text</button>
-
-    <div id="summaryBox">
-      <div class="section-note" style="margin-top:8px;">
-        If copy to clipboard fails, long-press the text below and copy, then paste into your message.
-      </div>
-      <textarea id="summaryText" readonly></textarea>
-    </div>
   </div>
+
+  <!-- Text + Email button -->
+  <button onclick="sendSummary()" 
+    style="margin-top:20px; width:100%; padding:14px; font-size:18px; background:#f97316; color:white; border:none; border-radius:8px;">
+    📱 Text &amp; Email Summary
+  </button>
 </div>
 
 <script>
@@ -405,42 +393,26 @@
     return lines.join('\n');
   }
 
-  function copySummary() {
-    recalc(); // make sure numbers are up to date
-    var summary = buildSummary();
-
-    var box = document.getElementById('summaryBox');
-    var ta  = document.getElementById('summaryText');
-    box.style.display = 'block';
-    ta.value = summary;
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(summary)
-        .then(function(){
-          alert('Summary copied. Paste into your text message.');
-        })
-        .catch(function(){
-          alert('Summary ready below. Long-press the text and copy.');
-        });
-    } else {
-      alert('Summary ready below. Long-press the text and copy.');
-    }
-  }
-</script>
-  <button onclick="sendText()" 
-style="margin-top:20px; width:100%; padding:14px; font-size:18px; background:#f97316; color:white; border:none; border-radius:8px;">
-📱 Text Summary
-</button>
-
-<script>
-function sendText() {
+  function sendSummary() {
     recalc();  
-    var summary = encodeURIComponent(buildSummary());
-    var phone = "7326296816"; // <<< CHANGE THIS TO YOUR PHONE NUMBER
+    var rawSummary = buildSummary();
+    var encodedSummary = encodeURIComponent(rawSummary);
 
-    // Opens iMessage/SMS app with summary pre-filled
-    window.location.href = "sms:" + phone + "?&body=" + summary;
-}
+    var phone = "7326296816";              // <<< your phone number (already set)
+    var email = "your-email@example.com";  // <<< CHANGE THIS to your email
+
+    var smsLink    = "sms:" + phone + "?&body=" + encodedSummary;
+    var mailtoLink = "mailto:" + encodeURIComponent(email)
+                    + "?subject=" + encodeURIComponent("Daily F2 Projections")
+                    + "&body=" + encodedSummary;
+
+    // Try opening email first, then SMS
+    // (behavior can vary by device/browser, but this is the closest to "both at once")
+    window.location.href = mailtoLink;
+    setTimeout(function() {
+      window.location.href = smsLink;
+    }, 500);
+  }
 </script>
 </body>
 </html>
